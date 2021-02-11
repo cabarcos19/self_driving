@@ -30,11 +30,11 @@ state_dict_ = {
 def clbk_laser(msg):
     global regions_
     regions_ = {
-        'right':  min(min(msg.ranges[0:71]), 10),
-        'fright': min(min(msg.ranges[72:143]), 10),
-        'front':  min(min(msg.ranges[144:215]), 10),
-        'fleft':  min(min(msg.ranges[216:287]), 10),
-        'left':   min(min(msg.ranges[288:359]), 10),
+        'right':  min(min(msg.ranges[0:109]), 10),
+        'fright': min(min(msg.ranges[110:174]), 10),
+        'front':  min(min(msg.ranges[175:184]), 10),
+        'fleft':  min(min(msg.ranges[185:249]), 10),
+        'left':   min(min(msg.ranges[250:359]), 10),
     }
 
     take_action()
@@ -58,39 +58,54 @@ def take_action():
 
     d_detection = 1.5
     d = 1
+    d_emergency = 0.1
 
-    t_object_detection = time.time()
-    if regions['front'] > d_detection:
+    if regions['front'] >= d_detection:
         state_description = 'case 0 - go straight'
         change_state(0)
+    else:
 
-    elif regions['front'] < d_detection and regions['fleft'] < d and regions['fright'] > d:
-        state_description = 'case 2 - go front right'
-        change_state(2)
+        # fleft && fright > d
+        if regions['fleft'] > d and regions['fright'] > d and regions['fleft'] > regions['fright']:
+	    state_description = 'case x move to the fleft'
+            change_state(1) #move to fleft
+    
+        elif regions['fleft'] > d and regions['fright'] > d and regions['fleft'] < regions['fright']:
+            state_description = 'case x move to the fright'
+            change_state(2) #move to fright
 
-    elif regions['front'] < d_detection and regions['fleft'] > d and regions['fright'] < d:
-        state_description = 'case 1 - go front left'
-        change_state(1)
+        # fleft && fright < d
+        elif regions['fleft'] < d and regions['fright'] < d and regions['fleft'] > regions['fright']:
+            state_description = 'case x move to the fleft'
+            change_state(1) #move to fleft
+            
+        elif regions['fleft'] < d and regions['fright'] < d and regions['fleft'] < regions['fright']:
+            state_description = 'case x move to the fright'
+            change_state(2) #move to fright
 
-    elif regions['front'] < d_detection and regions['fleft'] > d and regions['fright'] > d and regions['left'] < d and regions['right'] > d:
-        state_description = 'case 3 - turn right'
-        change_state(3)
+        # fleft < d && fright > d or fleft > d && fright < d
+        elif regions['fleft'] < d and regions['fright'] > d:
+            state_description = 'case 2 - go front right'
+            change_state(2)
 
-    elif regions['front'] < d_detection and regions['fleft'] > d and regions['fright'] > d and regions['left'] > d and regions['right'] < d:
-        state_description = 'case 4 - turn left'
-        change_state(4)
-    else :
-	state_description = 'case 5 - emergency stop'
-	change_state(5)
+        elif regions['fleft'] > d and regions['fright'] < d:
+            state_description = 'case 1 - go front left'
+            change_state(1)
+
+    #emergency stop        
+    if regions['front'] < d_emergency and regions['fleft'] < d_emergency and regions['fright'] < d_emergency:
+  	    state_description = 'case 5 - emergency stop'
+	    change_state(5)
 
     rospy.loginfo(regions)
+   
 
 def turn_fright():
     global regions_
 
     msg = Twist()
-    msg.linear.x = 0.20
-    msg.angular.z = -0.75
+    msg.linear.x = 0.15
+    msg.angular.z = -1
     return msg
 
 def turn_right():
@@ -104,8 +119,8 @@ def turn_fleft():
     global regions_
 
     msg = Twist()
-    msg.linear.x = 0.20
-    msg.angular.z = 0.5
+    msg.linear.x = 0.15
+    msg.angular.z = 1
     return msg
 
 def turn_left():
@@ -119,8 +134,9 @@ def straight():
     global regions_
 
     msg = Twist()
-    msg.linear.x = 0.20
+    msg.linear.x = 0.15
     return msg
+
 
 def emergency_stop():
     global regions_
