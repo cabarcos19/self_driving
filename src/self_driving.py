@@ -12,12 +12,12 @@ pub_ = None
 regions_ = {
     'back_right': 0,
     'lateral_right':0,
-	'middle_right':0,
-	'fright': 0,
+    'middle_right':0,
+    'fright': 0,
     'front': 0,
     'fleft': 0,
-	'middle_left': 0,
-	'lateral_left': 0,
+    'middle_left': 0,
+    'lateral_left': 0,
     'left': 0,
 }
 state_ = 0
@@ -35,14 +35,14 @@ def clbk_laser(msg):
     global regions_
     regions_ = {
         'back_right':  min(min(msg.ranges[0:84]), 12),
-		'lateral_right': min(min(msg.ranges[85:94]),12),
+	'lateral_right': min(min(msg.ranges[85:94]),12),
         'middle_right': min(min(msg.ranges[95:109]),12),
-		'fright': min(min(msg.ranges[110:174]), 12),
+	'fright': min(min(msg.ranges[110:174]), 12),
         'front':  min(min(msg.ranges[175:184]), 12),
         'fleft':  min(min(msg.ranges[185:249]), 12),
-		'middle_left': min(min(msg.ranges[250:264]),12),
+	'middle_left': min(min(msg.ranges[250:264]),12),
         'lateral_left': min(min(msg.ranges[265:274]),12),
-		'back_left':   min(min(msg.ranges[275:359]), 12),
+	'back_left':   min(min(msg.ranges[275:359]), 12),
     }
 	
     take_action()
@@ -53,20 +53,6 @@ def change_state(state):
     if state is not state_:
         print 'Action - [%s] - %s' % (state, state_dict_[state])
         state_ = state
-
-def center_car(float lateral_left_laser,float lateral_right_laser):
-	l_left = round(lateral_left_laser,2)
-	l_right = round(lateral_right_laser,2)
-	center = l_left + l_right
-	center_r = round(center,2)
-	
-	if(l_left < center_r):
-		while(l_left != center_r):
-			turn_fleft()
-	else:
-		while(l_right != center_r):
-			turn_fright()
-
 
 def take_action():
     global regions_
@@ -80,14 +66,26 @@ def take_action():
     d_detection = 1.5
     d = 1
     d_emergency = 0.1
-	
-	center_car(regions['lateral_left'],regions['lateral_right'])
-	
-    if regions['front'] >= d_detection:
-        state_description = 'case 0 - go straight'
-        change_state(0)
-    else:
 
+
+    #center the car
+    l_left = round(regions['lateral_left'],2)
+    l_right = round(regions['lateral_right'],2)
+    center = l_left + l_right
+    center_r = round(center,2)
+    
+    if(l_left < center_r):
+        while(l_left != center_r):
+	    change_state(1)
+    elif:
+        while(l_right != center_r):
+	    change_state(2)
+
+    else:
+	
+    	if regions['front'] >= d_detection:
+            state_description = 'case 0 - go straight'
+            change_state(0)
         # fleft && fright > d
         if regions['fleft'] > d and regions['fright'] > d and regions['fleft'] > regions['fright']:
 	    state_description = 'case x move to the fleft'
@@ -115,9 +113,9 @@ def take_action():
             state_description = 'case 1 - go front left'
             change_state(1)
 		#emergency stop
-		else:
-        	state_description = 'case 5 - emergency stop'
-	    	change_state(5)
+	else:
+            state_description = 'case 5 - emergency stop'
+	    change_state(5)
 
     #rospy.loginfo(regions)
    
@@ -187,12 +185,12 @@ def main():
         elif state_ == 2:
             msg = turn_fright()
         elif state_ == 3:
-	    	msg = turn_right()
-		elif state_ == 4:
-	    	msg = turn_left()
-		elif state_ == 5:
-	    	msg = emergency_stop()
-	    	pass
+	    msg = turn_right()
+	elif state_ == 4:
+	    msg = turn_left()
+	elif state_ == 5:
+	    msg = emergency_stop()
+	    pass
         else:
             rospy.logerr('Unknown state!')
 
