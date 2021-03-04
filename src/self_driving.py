@@ -75,17 +75,18 @@ def take_action():
     #calculate circuit width and center
     circuit_width = l_left + l_right
     center = round(l_left + l_right / 2,2)
-    #create an optimal region in the center
-    center_region = circuit_width / 3
-    left_limit = center - center_region
-    right_limit = center + center_region
+    #set the limit
+    limit = round(center - circuit_width * 0.1,2)
+    rospy.loginfo('circuit with:%s ',circuit_width)
+    rospy.loginfo('center:%s ',center)
+    rospy.loginfo('limit:%s ',limit)
     
     if(l_left < center):
-        while(l_left < left_limit):
+        if(l_left < limit):
 	    change_state(2)
 	    print 'centering to the right'
     elif(l_right < center):
-        while(l_right < right_limit):
+        if(l_right < limit):
 	    change_state(1)
 	    print 'centering to the left'
 
