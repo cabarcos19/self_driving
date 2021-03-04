@@ -67,64 +67,62 @@ def take_action():
     d = 1
     d_emergency = 0.1
 
-
-    #center the car
-    #obtain lateral distances
-    l_left = round(regions['lateral_left'],2)
-    l_right = round(regions['lateral_right'],2)
-    #calculate circuit width and center
-    circuit_width = l_left + l_right
-    center = round(l_left + l_right / 2,2)
-    #set the limit
-    limit = round(center - circuit_width * 0.1,2)
-    rospy.loginfo('circuit with:%s ',circuit_width)
-    rospy.loginfo('center:%s ',center)
-    rospy.loginfo('limit:%s ',limit)
-    
-    if(l_left < center):
-        if(l_left < limit):
-	    change_state(2)
-	    print 'centering to the right'
-    elif(l_right < center):
-        if(l_right < limit):
-	    change_state(1)
-	    print 'centering to the left'
-
-    else:
 	
-    	if regions['front'] >= d_detection:
-            state_description = 'case 0 - go straight'
-            change_state(0)
-        # fleft && fright > d
-        elif regions['fleft'] > d and regions['fright'] > d and regions['fleft'] > regions['fright']:
-	    state_description = 'case x move to the fleft'
-            change_state(1) #move to fleft
+    if regions['front'] >= d_detection:
+        #center the car
+    	#obtain lateral distances
+        l_left = round(regions['lateral_left'],2)
+        l_right = round(regions['lateral_right'],2)
+    	#calculate circuit width and center
+    	circuit_width = l_left + l_right
+    	center = round((l_left + l_right) / 2,2)
+    	#set the limit
+    	limit = round(center - circuit_width * 0.1,2)
+    	rospy.loginfo('circuit with:%s ',circuit_width)
+    	rospy.loginfo('center:%s ',center)
+    	rospy.loginfo('limit:%s ',limit)
+
+    	if(l_left < center):
+            if(l_left < limit):
+            	change_state(2)
+            	print 'centering to the right'
+    	elif(l_right < center):
+            if(l_right < limit):
+            	change_state(1)
+                print 'centering to the left'
+	state_description = 'case 0 - go straight'
+        change_state(0)
     
-        elif regions['fleft'] > d and regions['fright'] > d and regions['fleft'] < regions['fright']:
-            state_description = 'case x move to the fright'
-            change_state(2) #move to fright
+    # fleft && fright > d
+    elif regions['fleft'] > d and regions['fright'] > d and regions['fleft'] > regions['fright']:
+	state_description = 'case x move to the fleft'
+        change_state(1) #move to fleft
+    
+    elif regions['fleft'] > d and regions['fright'] > d and regions['fleft'] < regions['fright']:
+        state_description = 'case x move to the fright'
+        change_state(2) #move to fright
 
-        # fleft && fright < d
-        elif regions['fleft'] < d and regions['fright'] < d and regions['fleft'] > regions['fright']:
-            state_description = 'case x move to the fleft'
-            change_state(1) #move to fleft
+    # fleft && fright < d
+    elif regions['fleft'] < d and regions['fright'] < d and regions['fleft'] > regions['fright']:
+        state_description = 'case x move to the fleft'
+        change_state(1) #move to fleft
             
-        elif regions['fleft'] < d and regions['fright'] < d and regions['fleft'] < regions['fright']:
-            state_description = 'case x move to the fright'
-            change_state(2) #move to fright
+    elif regions['fleft'] < d and regions['fright'] < d and regions['fleft'] < regions['fright']:
+        state_description = 'case x move to the fright'
+        change_state(2) #move to fright
 
-        # fleft < d && fright > d or fleft > d && fright < d
-        elif regions['fleft'] < d and regions['fright'] > d:
-            state_description = 'case 2 - go front right'
-            change_state(2)
+    # fleft < d && fright > d or fleft > d && fright < d
+    elif regions['fleft'] < d and regions['fright'] > d:
+        state_description = 'case 2 - go front right'
+        change_state(2)
 
-        elif regions['fleft'] > d and regions['fright'] < d:
-            state_description = 'case 1 - go front left'
-            change_state(1)
-		#emergency stop
-	else:
-            state_description = 'case 5 - emergency stop'
-	    change_state(5)
+    elif regions['fleft'] > d and regions['fright'] < d:
+        state_description = 'case 1 - go front left'
+        change_state(1)
+    #emergency stop
+    else:
+        state_description = 'case 5 - emergency stop'
+	change_state(5)
 
     #rospy.loginfo(regions)
    
