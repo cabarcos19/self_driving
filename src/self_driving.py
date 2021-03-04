@@ -69,17 +69,25 @@ def take_action():
 
 
     #center the car
+    #obtain lateral distances
     l_left = round(regions['lateral_left'],2)
     l_right = round(regions['lateral_right'],2)
-    center = l_left + l_right
-    center_r = round(center,2)
+    #calculate circuit width and center
+    circuit_width = l_left + l_right
+    center = round(l_left + l_right / 2,2)
+    #create an optimal region in the center
+    center_region = circuit_width / 3
+    left_limit = center - center_region
+    right_limit = center + center_region
     
-    if(l_left < center_r):
-        while(l_left != center_r):
-	    change_state(1)
-    elif:
-        while(l_right != center_r):
+    if(l_left < center):
+        while(l_left < left_limit):
 	    change_state(2)
+	    print 'centering to the right'
+    elif(l_right < center):
+        while(l_right < right_limit):
+	    change_state(1)
+	    print 'centering to the left'
 
     else:
 	
@@ -87,7 +95,7 @@ def take_action():
             state_description = 'case 0 - go straight'
             change_state(0)
         # fleft && fright > d
-        if regions['fleft'] > d and regions['fright'] > d and regions['fleft'] > regions['fright']:
+        elif regions['fleft'] > d and regions['fright'] > d and regions['fleft'] > regions['fright']:
 	    state_description = 'case x move to the fleft'
             change_state(1) #move to fleft
     
