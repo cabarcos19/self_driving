@@ -63,9 +63,9 @@ def take_action():
 
     state_description = ''
 
-    d_detection = 1.5
-    d = 1
-    d_emergency = 0.1
+    d_detection = 2
+    d = 1.5
+    d_emergency = 0.5
 
 	
     if regions['front'] >= d_detection:
@@ -131,7 +131,7 @@ def turn_fright():
     global regions_
 
     msg = Twist()
-    msg.linear.x = 0.15
+    msg.linear.x = 0.20
     msg.angular.z = -1
     return msg
 
@@ -146,7 +146,7 @@ def turn_fleft():
     global regions_
 
     msg = Twist()
-    msg.linear.x = 0.15
+    msg.linear.x = 0.20
     msg.angular.z = 1
     return msg
 
@@ -161,7 +161,7 @@ def straight():
     global regions_
 
     msg = Twist()
-    msg.linear.x = 0.15
+    msg.linear.x = 0.25
     return msg
 
 
@@ -173,16 +173,21 @@ def emergency_stop():
     msg.angular.z = 0
     return msg
 
+def shutdown():
+    
+
 def main():
     global pub_
 
     rospy.init_node('reading_laser')
 	#queue size = 1 by default
-    pub_ = rospy.Publisher('/cmd_vel', Twist, queue_size=2)
+    pub_ = rospy.Publisher('/cmd_vel', Twist, queue_size=1)
 
     sub = rospy.Subscriber('/scan', LaserScan, clbk_laser)
 
     rate = rospy.Rate(20)
+    
+
     while not rospy.is_shutdown():
         msg = Twist()
         if state_ == 0:
@@ -204,7 +209,10 @@ def main():
         pub_.publish(msg)
 
         rate.sleep()
-
+    
+    msg_ = Twist()
+    msg_ = emergency_stop()
+    pub_.publish(msg)
 
 if __name__ == '__main__':
     main()
