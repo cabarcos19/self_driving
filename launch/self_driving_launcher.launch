@@ -1,6 +1,5 @@
 <launch>
-	<include file="$(find rplidar_ros)/launch/rplidar.launch"/>
-        <node pkg="self_driving" name="self_driving_converter" type="twist_to_pololu.py"/>
+    <node pkg="self_driving" name="self_driving_converter" type="rc_controller.py"/>
 	<node pkg="self_driving" name="self_driving" type="self_driving.py" output="screen"/>
 </launch>
 

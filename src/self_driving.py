@@ -63,9 +63,9 @@ def take_action():
 
     state_description = ''
 
-    d_detection = 2
-    d = 1.5
-    d_emergency = 0.5
+    d_detection = 2.5
+    d = 2.0
+    d_emergency = 1.0
 
 	
     if regions['front'] >= d_detection:
@@ -93,52 +93,58 @@ def take_action():
 	state_description = 'case 0 - go straight'
         change_state(0)
     
+    #emergency stop
+    elif regions['fleft'] < d_emergency and regions['fright'] < d_emergency and regions['front'] < d_emergency :
+        state_description = 'case 0: emergency stop'
+        print (state_description)
+        change_state(5)
     # fleft && fright > d
     elif regions['fleft'] > d and regions['fright'] > d and regions['fleft'] > regions['fright']:
-	state_description = 'case x move to the fleft'
+	state_description = 'case 1 fleft && fright and fleft > fright move to the fleft'
+        print (state_description)
         change_state(1) #move to fleft
     
     elif regions['fleft'] > d and regions['fright'] > d and regions['fleft'] < regions['fright']:
-        state_description = 'case x move to the fright'
+        state_description = 'case 2 fleft && fright and fleft < fright move to the fright'
+        print (state_description)
         change_state(2) #move to fright
 
     # fleft && fright < d
     elif regions['fleft'] < d and regions['fright'] < d and regions['fleft'] > regions['fright']:
-        state_description = 'case x move to the fleft'
-        change_state(1) #move to fleft
+        state_description = 'case 3 fleft && fright < d and fleft > fright move to the fleft'
+        print (state_description)
+        change_state(4) #move to left
             
     elif regions['fleft'] < d and regions['fright'] < d and regions['fleft'] < regions['fright']:
-        state_description = 'case x move to the fright'
-        change_state(2) #move to fright
+        state_description = 'case 4 fleft && fright < d and fleft < fright move to the fright'
+        print (state_description)
+        change_state(3) #move to right
 
     # fleft < d && fright > d or fleft > d && fright < d
     elif regions['fleft'] < d and regions['fright'] > d:
-        state_description = 'case 2 - go front right'
+        state_description = 'case 5: fleft < d && fright > d move to fright'
+        print (state_description)
         change_state(2)
 
     elif regions['fleft'] > d and regions['fright'] < d:
-        state_description = 'case 1 - go front left'
+        state_description = 'case 6: fleft > d && fright < d move to fleft'
+        print (state_description)
         change_state(1)
-    #emergency stop
-    else:
-        state_description = 'case 5 - emergency stop'
-	change_state(5)
-
-    #rospy.loginfo(regions)
    
 
 def turn_fright():
     global regions_
 
     msg = Twist()
-    msg.linear.x = 0.20
-    msg.angular.z = -1
+    msg.linear.x = 0.60
+    msg.angular.z = -0.75
     return msg
 
 def turn_right():
     global regions_
 
     msg = Twist()
+    msg.linear.x = 0.55
     msg.angular.z = -1
     return msg
 
@@ -146,14 +152,15 @@ def turn_fleft():
     global regions_
 
     msg = Twist()
-    msg.linear.x = 0.20
-    msg.angular.z = 1
+    msg.linear.x = 0.60
+    msg.angular.z = 0.75
     return msg
 
 def turn_left():
     global regions_
 
     msg = Twist()
+    msg.linear.x = 0.55
     msg.angular.z = 1
     return msg
 
@@ -161,7 +168,7 @@ def straight():
     global regions_
 
     msg = Twist()
-    msg.linear.x = 0.25
+    msg.linear.x = 0.65
     return msg
 
 
@@ -169,11 +176,11 @@ def emergency_stop():
     global regions_
     
     msg = Twist()
-    msg.linear.x = 0
-    msg.angular.z = 0
+    msg.linear.x = 0.0
+    msg.angular.z = 0.0
     return msg
 
-def shutdown():
+
     
 
 def main():
@@ -209,10 +216,6 @@ def main():
         pub_.publish(msg)
 
         rate.sleep()
-    
-    msg_ = Twist()
-    msg_ = emergency_stop()
-    pub_.publish(msg)
 
 if __name__ == '__main__':
     main()
