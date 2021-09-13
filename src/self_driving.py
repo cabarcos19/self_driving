@@ -136,8 +136,8 @@ def turn_fright():
     global regions_
 
     msg = Twist()
-    msg.linear.x = 0.60
-    msg.angular.z = -0.75
+    msg.linear.x = 0.22
+    msg.angular.z = -0.65
     return msg
 
 def turn_right():
@@ -145,22 +145,22 @@ def turn_right():
 
     msg = Twist()
     msg.linear.x = 0.55
-    msg.angular.z = -1
+    msg.angular.z = -0.9
     return msg
 
 def turn_fleft():
     global regions_
 
     msg = Twist()
-    msg.linear.x = 0.60
-    msg.angular.z = 0.75
+    msg.linear.x = 0.22
+    msg.angular.z = 0.65
     return msg
 
 def turn_left():
     global regions_
 
     msg = Twist()
-    msg.linear.x = 0.55
+    msg.linear.x = 0.90
     msg.angular.z = 1
     return msg
 
@@ -168,7 +168,7 @@ def straight():
     global regions_
 
     msg = Twist()
-    msg.linear.x = 0.65
+    msg.linear.x = 0.25
     return msg
 
 

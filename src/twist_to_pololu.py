@@ -3,9 +3,9 @@
 
 import maestro,rospy,time
 from geometry_msgs.msg import Twist
-
+from std_msgs.msg import Int32
 class ServoConvert():
-    def __init__(self,channel,center_value=6000, range=3000):
+    def __init__(self,channel,center_value=6000, range=1500):
         self.channel    = channel
 	self.value      = 0.0
         self.value_out  = center_value
@@ -52,17 +52,23 @@ class CarControl():
         	"""
         	Get a message from cmd_vel, assuming a maximum input of 1
        		"""
-        	#-- Save the time
+        	pub_steering = rospy.Publisher('/pwm_steering', Int32, queue_size=10)
+                pub_throttle = rospy.Publisher('/pwm_throttle', Int32, queue_size=10)
+                #-- Save the time
         	self._last_time_cmd_rcv = time.time()
 
         	#-- Convert vel into servo values
         	th = self.actuators['throttle'].get_value_out(message.linear.x)
         	st = self.actuators['steering'].get_value_out(message.angular.z)
+                rospy.loginfo("Got a command twist v = %2.1f  s = %2.1f"%(message.linear.x, message.angular.z))
+                rospy.loginfo("Got a command pololu v = %2.1f  s = %2.1f"%(th,st))
 
 		#Sending info to the servos 
 		self.servo.setTarget(0,st)
 		self.servo.setTarget(1,th)
-    
+                pub_steering.publish(st)
+                pub_throttle.publish(th)
+                
 	def set_actuators_idle(self):
         	#-- Convert vel into servo values
         	th = self.actuators['throttle'].get_value_out(0)
